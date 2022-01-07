@@ -61,6 +61,7 @@ namespace Gerenciamento.Controllers
                 naturalidade.DataCriacao = DateTime.Now;
                 _context.Add(naturalidade);
                 await _context.SaveChangesAsync();
+                Naturalidade.NumeroDeNaturalidades++;
                 return RedirectToAction(nameof(Index));
             }
             return View(naturalidade);
@@ -143,6 +144,7 @@ namespace Gerenciamento.Controllers
             var naturalidade = await _context.Naturalidade.FindAsync(id);
             _context.Naturalidade.Remove(naturalidade);
             await _context.SaveChangesAsync();
+            Naturalidade.NumeroDeNaturalidades--;
             return RedirectToAction(nameof(Index));
         }
 
