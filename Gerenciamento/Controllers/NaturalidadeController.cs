@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Gerenciamento.Data;
 using Gerenciamento.Models;
+using Gerenciamento.Utils.Response;
 
 namespace Gerenciamento.Controllers
 {
@@ -141,12 +142,30 @@ namespace Gerenciamento.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
             var naturalidade = await _context.Naturalidade.FindAsync(id);
-            _context.Naturalidade.Remove(naturalidade);
-            await _context.SaveChangesAsync();
-            Naturalidade.NumeroDeNaturalidades--;
-            return RedirectToAction(nameof(Index));
+            var peixe = await _context.Peixe.FirstOrDefaultAsync(p => p.NaturalidadeId == id);
+
+            if (peixe == null)
+            {
+                _context.Naturalidade.Remove(naturalidade);
+                await _context.SaveChangesAsync();
+                Naturalidade.NumeroDeNaturalidades--;
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                return Json(ResponseObject.ErrorResponse(message: "Um peixe é desta Naturalidade: " + naturalidade.Descricao));
+            }
+
+  
         }
+
 
         private bool NaturalidadeExists(int id)
         {
